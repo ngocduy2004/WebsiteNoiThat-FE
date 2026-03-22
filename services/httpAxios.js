@@ -1,6 +1,6 @@
 import axios from "axios";
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost/CDTT_Backend/public/api/",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://websitenoithat-be-production.up.railway.app/api/","http://localhost/CDTT_Backend/public/api/",
 });
 
 api.interceptors.response.use(
