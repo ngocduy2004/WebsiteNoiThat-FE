@@ -4,12 +4,11 @@ const GUEST_CART_KEY = "guest_cart";
 
 function getAuthHeader() {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token");
-    return token ? { Authorization: `Bearer ${token}` } : null;
+    const token = localStorage.getItem("token"); // Đảm bảo key này khớp với bên Login
+    return token ? { 'Authorization': `Bearer ${token}` } : null;
   }
   return null;
 }
-
 const cartService = {
   getLocalCart: () => {
     if (typeof window === "undefined") return { items: [] };
@@ -52,7 +51,7 @@ const cartService = {
           { headers }
         );
 
-        return res.data.cart; // 🔥 FIX QUAN TRỌNG
+       return res.cart;
       } catch (err) {
         console.log("Add to cart error:", err.response);
         throw err;
