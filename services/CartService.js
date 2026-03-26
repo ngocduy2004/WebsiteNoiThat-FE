@@ -40,20 +40,29 @@ const cartService = {
 
   addToCart: async (product, quantity) => {
     const headers = getAuthHeader();
+
     if (headers) {
       try {
-        const res = await httpAxios.post("add-to-cart", {
-          product_id: product.id,
-          quantity
-        }, { headers });
-        return res.cart;
+        const res = await httpAxios.post(
+          "add-to-cart",
+          {
+            product_id: product.id,
+            quantity
+          },
+          { headers }
+        );
+
+        return res.data.cart; // 🔥 FIX QUAN TRỌNG
       } catch (err) {
+        console.log("Add to cart error:", err.response);
         throw err;
       }
     }
 
+    // Guest cart
     let cart = cartService.getLocalCart();
     const existingItem = cart.items.find(item => item.product_id === product.id);
+
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
@@ -61,9 +70,10 @@ const cartService = {
         product_id: product.id,
         quantity,
         price: product.price_buy || product.price,
-        product: product // Lưu object để hiện ảnh/tên
+        product: product
       });
     }
+
     localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
     return cart;
   },
