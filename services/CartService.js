@@ -105,19 +105,20 @@ const cartService = {
     localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
     return cart;
 
-  }, removeItem: async (product_id) => {
-    const headers = getAuthHeader();
-    if (headers) {
-      // Đảm bảo lấy .cart từ response của API
-      const res = await httpAxios.delete(`remove-item/${product_id}`, { headers });
-      return res.cart;
-    }
-    // Logic cho Guest (giữ nguyên)
-    let cart = cartService.getLocalCart();
-    cart.items = cart.items.filter(i => i.product_id !== product_id);
-    localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
-    return cart;
   },
+  //  removeItem: async (product_id) => {
+  //   const headers = getAuthHeader();
+  //   if (headers) {
+  //     // Đảm bảo lấy .cart từ response của API
+  //     const res = await httpAxios.delete(`remove-item/${product_id}`, { headers });
+  //     return res.cart;
+  //   }
+  //   // Logic cho Guest (giữ nguyên)
+  //   let cart = cartService.getLocalCart();
+  //   cart.items = cart.items.filter(i => i.product_id !== product_id);
+  //   localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
+  //   return cart;
+  // },
 
   clearCart: async () => {
     const headers = getAuthHeader();

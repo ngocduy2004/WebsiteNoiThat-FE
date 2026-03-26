@@ -7,10 +7,12 @@ export const login = async (username, password) => {
   try {
     const data = await api.post("login", { username, password });
 
-    // data CHÍNH LÀ response.data
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.role);
     localStorage.setItem("user", JSON.stringify(data.user));
+
+    // 🔥 THÊM DÒNG NÀY
+    await cartService.mergeCart();
 
     return data;
   } catch (err) {
@@ -18,7 +20,6 @@ export const login = async (username, password) => {
     throw new Error("Đăng nhập thất bại");
   }
 };
-
 // LOGOUT
 export const logout = async () => {
   const token = localStorage.getItem("token");
