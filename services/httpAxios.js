@@ -20,15 +20,15 @@ api.interceptors.request.use(
   }
 );
 
-api.interceptors.response.use(
-  (response) => response.data,
-  (error) => {
-    // Nếu bị lỗi 401 (hết hạn token), bạn có thể xử lý logout ở đây
-    if (error.response && error.response.status === 401) {
-      console.error("Phiên đăng nhập hết hạn!");
+api.interceptors.request.use(
+  (config) => {
+    // SỬA: Lấy cả 2 key cho chắc chắn
+    const token = localStorage.getItem("access_token") || localStorage.getItem("token"); 
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return Promise.reject(error);
-  }
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
-
 export default api;
