@@ -5,7 +5,7 @@ const GUEST_CART_KEY = "guest_cart";
 
 function getAuthHeader() {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token"); // Đảm bảo key này khớp với bên Login
+    const token = localStorage.getItem("access_token"); // Đảm bảo key này khớp với bên Login
     return token ? { 'Authorization': `Bearer ${token}` } : null;
   }
   return null;
@@ -38,27 +38,23 @@ const cartService = {
     return cartService.getLocalCart();
   },
 
-  addToCart: async (product, quantity) => {
+addToCart: async (product, quantity) => {
     const headers = getAuthHeader();
-
     if (headers) {
-      try {
-        const res = await httpAxios.post(
-          "add-to-cart",
-          {
-            product_id: product.id,
-            quantity
-          },
-          { headers }
-        );
+        try {
+            const res = await httpAxios.post("add-to-cart", {
+                product_id: product.id,
+                quantity
+            }, { headers });
 
-       return res.cart;
-      } catch (err) {
-        console.log("Add to cart error:", err.response);
-        throw err;
-      }
+            // Trả về res nếu backend trả về thẳng object cart, 
+            // hoặc res.cart nếu backend bọc trong key 'cart'
+            return res.cart || res; 
+        } catch (err) {
+            console.error("Add to cart error details:", err.response?.data);
+            throw err;
+        }
     }
-
     // Guest cart
     let cart = cartService.getLocalCart();
     const existingItem = cart.items.find(item => item.product_id === product.id);

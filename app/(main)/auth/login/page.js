@@ -37,7 +37,7 @@ function LoginContent() {
 
       // Lưu token vào localStorage (thường authService đã làm, nhưng làm lại cho chắc chắn)
       if (data.token) {
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("access_token", data.token);
       }
 
       // 3. THỰC HIỆN MERGE CART NGAY LẬP TỨC

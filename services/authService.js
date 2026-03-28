@@ -7,7 +7,7 @@ export const login = async (username, password) => {
   try {
     const data = await api.post("login", { username, password });
 
-    localStorage.setItem("token", data.token);
+    localStorage.setItem("access_token", data.token);
     localStorage.setItem("role", data.role);
     localStorage.setItem("user", JSON.stringify(data.user));
 
