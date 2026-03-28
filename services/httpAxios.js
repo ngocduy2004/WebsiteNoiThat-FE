@@ -1,31 +1,33 @@
 import axios from "axios";
 
 const api = axios.create({
-  // Ưu tiên lấy từ biến môi trường, nếu không có thì dùng link Railway trực tiếp
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://websitenoithat-be-production.up.railway.app/api"
+  // BẮT BUỘC: Dùng https và KHÔNG có dấu / ở cuối api để tránh Redirect 301
+  baseURL: "https://websitenoithat-be-production.up.railway.app/api"
 });
 
-// THÊM ĐOẠN NÀY: Interceptor cho Request (Gửi Token đi)
 api.interceptors.request.use(
   (config) => {
-    // Lấy token từ localStorage (đảm bảo lúc đăng nhập bạn đã lưu với key 'access_token')
-    const token = localStorage.getItem("access_token"); 
+    // SỬA: Quét cả 2 key để chắc chắn lấy được Token JWT
+    const token = localStorage.getItem("access_token") || localStorage.getItem("token"); 
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Ép kiểu Content-Type để Backend Laravel nhận diện đúng JSON
+    config.headers["Content-Type"] = "application/json";
+    config.headers["Accept"] = "application/json";
+    
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    // Nếu bị lỗi 401 (hết hạn token), bạn có thể xử lý logout ở đây
     if (error.response && error.response.status === 401) {
-      console.error("Phiên đăng nhập hết hạn!");
+      console.error("Phiên đăng nhập hết hạn hoặc Token không hợp lệ!");
     }
     return Promise.reject(error);
   }
