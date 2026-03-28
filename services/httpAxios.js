@@ -1,31 +1,35 @@
 import axios from "axios";
 
 const api = axios.create({
-  // Ưu tiên lấy từ biến môi trường, nếu không có thì dùng link Railway trực tiếp
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://websitenoithat-be-production.up.railway.app/api"
+  // Đảm bảo không có dấu / ở cuối URL
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://websitenoithat-be-production.up.railway.app/api",
+  headers: {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+  }
 });
 
-// THÊM ĐOẠN NÀY: Interceptor cho Request (Gửi Token đi)
+// Tự động đính kèm Token vào MỌI request
 api.interceptors.request.use(
   (config) => {
-    // Lấy token từ localStorage (đảm bảo lúc đăng nhập bạn đã lưu với key 'access_token')
-    const token = localStorage.getItem("access_token"); 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (typeof window !== "undefined") {
+      // SỬA TẠI ĐÂY: Dùng đúng key bạn đã lưu lúc Login (thường là "token")
+      const token = localStorage.getItem("token"); 
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => response.data, // Trả về data trực tiếp (giúp CartService lấy được .cart luôn)
   (error) => {
-    // Nếu bị lỗi 401 (hết hạn token), bạn có thể xử lý logout ở đây
-    if (error.response && error.response.status === 401) {
-      console.error("Phiên đăng nhập hết hạn!");
+    if (error.response?.status === 401) {
+      console.error("Phiên đăng nhập hết hạn hoặc chưa đăng nhập!");
+      // localStorage.removeItem("token"); // Có thể xóa token cũ nếu muốn
     }
     return Promise.reject(error);
   }
